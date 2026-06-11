@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/nsyslog.dir/src/programs/nsyslog.c.o -o nsyslog  src/lib/libshm_ringbuf.a -luring -pthread 

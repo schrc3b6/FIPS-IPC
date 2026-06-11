@@ -1,0 +1,2 @@
+/usr/bin/ar qc libshm_ringbuf.a CMakeFiles/shm_ringbuf.dir/shm_ringbuf.c.o
+/usr/bin/ranlib libshm_ringbuf.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libebpf_utils.a CMakeFiles/ebpf_utils.dir/src/lib/ebpf_utils.c.o
+/usr/bin/ranlib libebpf_utils.a

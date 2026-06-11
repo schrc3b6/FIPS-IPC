@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/udp_server.dir/src/programs/udp_server.c.o -o udp_server  src/lib/libip_to_str.a src/lib/libshm_ringbuf.a -luring -pthread 

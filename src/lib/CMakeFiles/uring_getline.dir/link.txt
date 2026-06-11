@@ -1,0 +1,2 @@
+/usr/bin/ar qc liburing_getline.a CMakeFiles/uring_getline.dir/uring_getline.c.o
+/usr/bin/ranlib liburing_getline.a

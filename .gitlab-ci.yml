@@ -1,0 +1,33 @@
+default:
+  image: gitup.uni-potsdam.de:4567/bsvs/templates/ci-cd-images/codechecker-grpc:latest
+
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - test
+
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - bash ./build.sh
+  artifacts:
+    paths:
+      - build/
+
+
+
+codechecker:
+  stage: test
+  allow_failure: true
+  dependencies:
+    - build-job
+  script:
+    - CodeChecker analyze --ctu -o ./reports  ./build/compile_commands.json
+    - CodeChecker parse --trim-path-prefix $(pwd) -e codeclimate ./reports > gl-code-quality-report.json || true
+    - CodeChecker parse --trim-path-prefix $(pwd) -e html --output ./html ./reports
+  after_script:
+    - cat gl-code-quality-report.json
+    - ls -la
+    - pwd
+  artifacts:
+    paths:
+      - html

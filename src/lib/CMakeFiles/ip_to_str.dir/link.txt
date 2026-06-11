@@ -1,0 +1,2 @@
+/usr/bin/ar qc libip_to_str.a CMakeFiles/ip_to_str.dir/ip_to_str.c.o
+/usr/bin/ranlib libip_to_str.a

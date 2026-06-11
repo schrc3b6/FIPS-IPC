@@ -1,0 +1,2 @@
+/usr/bin/ar qc libip_hashtable.a CMakeFiles/ip_hashtable.dir/ip_hashtable.c.o
+/usr/bin/ranlib libip_hashtable.a

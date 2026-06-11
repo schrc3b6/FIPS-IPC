@@ -1,0 +1,2 @@
+/usr/bin/ar qc libspookyc.a "CMakeFiles/spookyc.dir/spooky-c.c.o"
+/usr/bin/ranlib libspookyc.a

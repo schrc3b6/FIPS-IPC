@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfips_ipc.a CMakeFiles/fips_ipc.dir/src/lib/shm_ringbuf.c.o
+/usr/bin/ranlib libfips_ipc.a

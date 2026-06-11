@@ -1,0 +1,5 @@
+add_subdirectory(lib)
+add_subdirectory(programs)
+add_subdirectory(utilities)
+add_subdirectory(ips-action)
+add_subdirectory(cmdline_prog)

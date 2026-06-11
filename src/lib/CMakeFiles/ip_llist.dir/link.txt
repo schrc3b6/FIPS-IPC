@@ -1,0 +1,2 @@
+/usr/bin/ar qc libip_llist.a CMakeFiles/ip_llist.dir/ip_llist.c.o
+/usr/bin/ranlib libip_llist.a

@@ -1,0 +1,10 @@
+[udp-testsvr]
+port    = 8080
+logpath = /mnt/scratch/PR/udpsvr.log
+enabled = true
+filter  = udp-testsvr
+findtime = 10
+bantime = 180
+action = xdp
+maxretry = 0
+ignoreip = 10.3.10.132 2001:db8::2

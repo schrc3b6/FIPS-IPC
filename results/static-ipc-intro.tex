@@ -1,0 +1,150 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{xcolor}
+\pgfplotsset{compat=1.18}
+\usepackage{pgfplotstable} % (optional; pgfplots loads what it needs)
+
+\definecolor{tabblue}{RGB}{31,119,180}
+\definecolor{taborange}{RGB}{255,127,14}
+\definecolor{tabgreen}{RGB}{44,160,44}
+\definecolor{tabred}{RGB}{214,39,40}
+\definecolor{tabpurple}{RGB}{148,103,189}
+\definecolor{tabbrown}{RGB}{140,86,75}
+\definecolor{tabpink}{RGB}{227,119,194}
+\definecolor{tabgray}{RGB}{127,127,127}
+\definecolor{tabolive}{RGB}{188,189,34}
+\definecolor{tabcyan}{RGB}{23,190,207}
+
+\makeatletter
+\newcommand{\dbg}[1]{\PackageWarningNoLine{pgfplots-debug}{#1}}
+\makeatother
+
+\pgfplotscreateplotcyclelist{tab10}{
+  {tabblue,   mark=*},
+  {taborange, mark=square*},
+  {tabgreen,  mark=triangle*},
+  {tabred,    mark=diamond*},
+  {tabpurple, mark=otimes*},
+  {tabbrown,  mark=star},
+  {tabpink,   mark=pentagon*},
+  {tabgray,   mark=+},
+  {tabolive,  mark=x},
+  {tabcyan,   mark=o},
+}
+\pgfplotsset{
+  myline/.style={line width=1.2pt, mark size=2.5pt, color=tabblue },
+  mylineSquare/.style={line width=1.2pt,  mark size=2.5pt, color=taborange },
+  mylineTriangle/.style={line width=1.2pt, mark size=3pt, color=tabgreen },
+  mylineDiamond/.style={line width=1.2pt, mark size=3pt, color=tabpurple },
+ only if/.style args={entry of #1 is #2}{
+    x filter/.code={
+      \edef\tempa{\thisrow{#1}}
+      \edef\tempb{#2}
+      \ifx\tempa\tempb
+      \else
+        \def\pgfmathresult{}
+      \fi
+    }
+  }
+}
+
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth,
+  height=0.55\textwidth,
+  xlabel={Packets Per Second},
+  yticklabel={\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+  ylabel={Replied Packets [\%]},
+  xmode=log,
+  log basis x=10,
+  xmin=9100, xmax=10900000,
+  % xtick={
+  %   10000,%20000,30000,40000,50000,60000,70000,80000,90000,
+  %   100000,%200000,300000,400000,500000,600000,700000,800000,900000,
+  %   1000000%,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000
+  % },
+  xticklabels={
+    1k,
+    10k,%20k,30k,40k,50k,60k,70k,80k,90k,
+    100k,%200k,300k,400k,500k,600k,700k,800k,900k,
+    1m,%2m,3m,4m,5m,6m,7m,8m,9m,
+    10m
+  },
+  grid=both,
+  minor x tick num=9,
+  tick align=outside,
+  axis lines=box,
+  tick align=outside,
+  xtick pos=bottom,
+  ytick pos=left,
+  % x tick label style={rotate=45,anchor=east},
+  legend pos=south west,
+  legend cell align=left,
+  % look a bit like your matplotlib sizing
+  tick label style={font=\large},
+  label style={font=\large},
+  cycle list name=tab10,
+]
+
+% ---- helpers: styles so each series has a marker + thicker line
+
+% We plot only these four kinds (as in your Python):
+%   'file', 'journal_file', 'none', 'syslog'
+% We filter rows by "kind" using row predicate.
+% You can reorder the \addplot blocks to control legend order.
+
+% None  -> "No Logging"
+\dbg{Plotting NONE}%
+\addplot+[myline]
+table[
+  col sep=semicolon,
+  x=pps,
+  y=packets_percent_median,
+  only if={entry of kind is none},
+  ]{./tmp/agg-static-ipc.csv};
+\addlegendentry{No Logging}
+
+% File -> "File Logging"
+\addplot+[mylineSquare]
+table[
+  col sep=semicolon,
+  x=pps,
+  y=packets_percent_median,
+  only if={entry of kind is file},
+]{./tmp/agg-static-ipc.csv};
+\addlegendentry{File Logging}
+
+% Syslog -> "Syslog Logging"
+\addplot+[mylineTriangle]
+table[
+  col sep=semicolon,
+  x=pps,
+  y=packets_percent_median,
+  only if={entry of kind is syslog},
+]{./tmp/agg-static-ipc.csv};
+\addlegendentry{Syslog Logging}
+
+% Journal_file -> "Systemd Journal"
+\addplot+[mylineDiamond]
+table[
+  col sep=semicolon,
+  x=pps,
+  y=packets_percent_median,
+  only if={entry of kind is journal_file},
+]{./tmp/agg-static-ipc.csv};
+\addlegendentry{Systemd Journal}
+
+\draw[latex-latex,very thick, color=tabred]
+  (axis cs:900000,0.97)
+  -- node[anchor=east,fill=white] {8.45$\times$}(axis cs:900000,0.15);
+
+\node[color=tabred,fill=white] (perc) at (axis cs:5000000,1.005) {99.94\%};
+\draw[latex-,very thick, color=tabred]
+  (axis cs:1000000,1.005)
+  -- (perc);
+
+\end{axis}
+\end{tikzpicture}
+\end{document}

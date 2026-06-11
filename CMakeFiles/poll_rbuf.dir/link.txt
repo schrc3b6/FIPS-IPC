@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/poll_rbuf.dir/src/utilities/poll_rbuf.c.o -o poll_rbuf  src/lib/libshm_ringbuf.a -pthread 

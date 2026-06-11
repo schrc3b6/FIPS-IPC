@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package intervention;
+
+service Intervention {
+    // send request to block an IPv4 address
+    rpc sendBlockRequest (BlockRequest) returns (BlockReply) {}
+
+    // send request to unblock an IPv4 address
+    rpc sendUnblockRequest (UnblockRequest) returns (UnblockReply) {}
+
+    // send request for status information of service on server
+    rpc sendStatusRequest (StatusRequest) returns (StatusReply) {}
+
+    // send request for list of all blocked IP addresses on server
+    rpc sendListRequest (ListRequest) returns (ListReply) {}
+}
+
+message IPAddress {
+    oneof ip_type {
+        bytes ipv4 = 1; // IPv4 address stored as 4 bytes
+        bytes ipv6 = 2; // IPv6 address stored as 16 bytes
+    }
+}
+
+
+
+// requests from client/backend
+message BlockRequest {
+    repeated IPAddress ip_address = 1;
+}
+
+message UnblockRequest {
+    repeated IPAddress ip_address = 1;
+}
+
+message StatusRequest {
+    string backendName = 1;
+}
+
+message ListRequest {
+    string backendName = 1;
+}
+
+// replies from server/load-balancer
+message BlockReply {
+    string message = 1;
+}
+
+message UnblockReply {
+    string message = 1;
+}
+
+message StatusReply {
+    string message = 1;
+}
+
+message ListReply {
+    string message = 1;
+    repeated string ipv4 = 2;
+    repeated string ipv6 = 3;
+    repeated string ipv6subnet = 4;
+    // following are for verdict count
+    repeated int64 ipv4count = 5;
+    repeated int64 ipv6count = 6;
+    repeated int64 ipv6subnetcount = 7;
+}

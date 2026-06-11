@@ -1,0 +1,187 @@
+%! TEX program = lualatex
+\documentclass{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{xcolor}
+\pgfplotsset{compat=1.18}
+\usepackage{pgfplotstable} % (optional; pgfplots loads what it needs)
+
+% \usepgfplotslibrary{external} 
+% \tikzexternalize
+% \tikzset{external/force remake}
+
+\definecolor{tabblue}{RGB}{31,119,180}
+\definecolor{taborange}{RGB}{255,127,14}
+\definecolor{tabgreen}{RGB}{44,160,44}
+\definecolor{tabred}{RGB}{214,39,40}
+\definecolor{tabpurple}{RGB}{148,103,189}
+\definecolor{tabbrown}{RGB}{140,86,75}
+\definecolor{tabpink}{RGB}{227,119,194}
+\definecolor{tabgray}{RGB}{127,127,127}
+\definecolor{tabolive}{RGB}{188,189,34}
+\definecolor{tabcyan}{RGB}{23,190,207}
+
+\makeatletter
+\newcommand{\dbg}[1]{\PackageWarningNoLine{pgfplots-debug}{#1}}
+\makeatother
+
+\pgfplotscreateplotcyclelist{tab10}{
+  {tabblue,   mark=*},
+  {taborange, mark=square*},
+  {tabgreen,  mark=triangle*},
+  {tabred,    mark=diamond*},
+  {tabpurple, mark=otimes*},
+  {tabbrown,  mark=star},
+  {tabpink,   mark=pentagon*},
+  {tabgray,   mark=+},
+  {tabolive,  mark=x},
+  {tabcyan,   mark=o},
+}
+\pgfplotsset{
+  mylineBlue/.style={line width=1.2pt, mark size=2.5pt, color=tabblue, mark=none},
+  mylineCyan/.style={line width=1.2pt, mark size=2.5pt, color=tabcyan, mark=none},
+  mylineOrange/.style={line width=1.2pt,  mark size=2.5pt, color=taborange, mark=none},
+  mylineRed/.style={line width=1.2pt,  mark size=2.5pt, color=tabred, mark=none},
+  mylineGreen/.style={line width=1.2pt, mark size=3pt, color=tabgreen, mark=none},
+  mylinePurple/.style={line width=1.2pt, mark size=3pt, color=tabpurple, mark=none},
+  mylineOlive/.style={line width=1.2pt, mark size=3pt, color=tabolive, mark=none},
+  mylineBrown/.style={line width=1.2pt, mark size=3pt, color=tabbrown, mark=none},
+ only if/.style args={entry of #1 is #2}{
+    x filter/.code={
+      \edef\tempa{\thisrow{#1}}
+      \edef\tempb{#2}
+      \ifx\tempa\tempb
+      \else
+        \def\pgfmathresult{}
+      \fi
+    }
+  }
+}
+
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth,
+  height=0.55\textwidth,
+  xlabel={Time [s]},
+  ylabel={Packets per Second},
+  % yticklabel={\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+  % xmode=log,
+  % log basis x=10,
+    xmin=-20, xmax=630,
+    ymin=-10000, ymax=145000,
+  % yticklabel={\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+  % % xtick={
+  % %   10000,%20000,30000,40000,50000,60000,70000,80000,90000,
+  % %   100000,%200000,300000,400000,500000,600000,700000,800000,900000,
+  % %   1000000%,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000
+  % % },
+  % xticklabels={
+  %   1k,
+  %   10k,%20k,30k,40k,50k,60k,70k,80k,90k,
+  %   100k,%200k,300k,400k,500k,600k,700k,800k,900k,
+  %   1m,%2m,3m,4m,5m,6m,7m,8m,9m,
+  %   10m
+  % },
+  grid=both,
+  % minor x tick num=9,
+  tick align=outside,
+  axis lines=box,
+  tick align=outside,
+  xtick pos=bottom,
+  ytick pos=left,
+  % x tick label style={rotate=45,anchor=east},
+  % legend pos=east,
+  % legend style={at={(axis cs:20,15000000)},anchor=east}
+  % legend cell align=left,
+  % look a bit like your matplotlib sizing
+  tick label style={font=\large},
+  label style={font=\large},
+  cycle list name=tab10,
+  legend style={at={(0.98,0.98)},anchor=north east, legend cell align=left},
+    extra x ticks={65,130,184,295,493},
+  extra x tick labels={$t_1$,$t_2$,$t_3$,$t_4$,$t_5$}, 
+  extra x tick style={
+grid=major,                       % Treat this extra tick as 'major' locally
+      major grid style={dotted, black}, % Force the line to be dotted (add 'thick' if needed)      
+      % tick align=inside,         % Makes the tick mark point inwards (above x-axis)
+% tick style={draw=none},           % Hides the physical tick mark
+xtick pos=top,            % Moves the tick mark to the top axis line
+xticklabel pos=top,
+      tick label style={         
+          rotate=0,
+          anchor=south,          % Anchors the bottom of the text
+           % yshift=-2.8em           % Pushes the 't1' label inside, above the axis line
+      }
+  },
+]
+
+% ---- helpers: styles so each series has a marker + thicker line
+
+% We plot only these four kinds (as in your Python):
+%   'file', 'journal_file', 'none', 'syslog'
+% We filter rows by "kind" using row predicate.
+% You can reorder the \addplot blocks to control legend order.
+
+% File -> "File Logging"
+\addplot+[mylineGreen]
+table[
+  col sep=comma,
+  x=time,
+  y=pass,
+  ]{./tmp/baseline.csv}; %
+\addlegendentry{Pkts Pass}
+
+% None  -> "No Logging"
+\addplot+[mylineRed]
+table[
+  col sep=comma,
+  x=time,
+  y=drop,
+  ]{./tmp/baseline.csv}; %
+\addlegendentry{Pkts Drop}
+
+\end{axis}
+% \begin{axis}[
+%   width=\textwidth,
+%   height=0.55\textwidth,
+%   ylabel={Replied Packets [\%]},
+%     xmin=-0.5, xmax=12,
+%     ymin=0, ymax=1.10,
+%   grid=both,
+%   tick align=outside,
+%   axis x line=none,   
+%   tick align=outside,
+%   % xtick pos=bottom,
+%   ytick pos=right,
+%   tick label style={font=\large},
+%   label style={font=\large},
+%   cycle list name=tab10,
+%   legend style={at={(0.98,0.5)},anchor=east, legend cell align=left},
+% ]
+% \addlegendimage{/pgfplots/refstyle=Fips_Drop}\addlegendentry{fips pkts drop}
+% \addlegendimage{/pgfplots/refstyle=Fips_Pass}\addlegendentry{fips pkts pass}
+% \addlegendimage{/pgfplots/refstyle=File_Drop}\addlegendentry{file pkts drop}
+% \addlegendimage{/pgfplots/refstyle=File_Pass}\addlegendentry{file pkts pass}
+%
+% % Journal_file -> "Systemd Journal"
+% \addplot+[mylineOlive]
+% table[
+%   col sep=semicolon,
+%   x=time,
+%   y=responses,
+% ]{./tmp/fips-response.csv};
+% \addlegendentry{fips replies}
+%
+% \addplot+[mylineBrown]
+% table[
+%   col sep=semicolon,
+%   x=time,
+%   y=responses,
+% ]{./tmp/file-response.csv};
+% \addlegendentry{file replies}
+%
+% \end{axis}
+
+\end{tikzpicture}
+\end{document}
